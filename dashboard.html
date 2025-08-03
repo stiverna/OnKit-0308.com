@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>OnKit – Bosh sahifa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h2 id="welcome">Assalomu alaykum</h2>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="menu" id="menu">
+      <a href="#" id="profileText">Profil</a>
+      <a href="#" id="searchBtn">🔍 Qidiruv</a>
+      <a href="#" id="inviteBtn">👥 Do‘stlarni taklif qilish</a>
+      <a href="#" id="logoutBtn">🚪 Chiqish</a>
+    </div>
+  </header>
+
+  <h3 id="profileTitle">Profilingiz</h3>
+
+  <div class="section">
+    <div class="profile-image">
+      <img src="https://via.placeholder.com/120" alt="Profil rasmi">
+    </div>
+    <input type="text" id="name" placeholder="Ismingiz">
+    <textarea id="bio" rows="3" placeholder="O‘zingiz haqingizda qisqacha yozing..."></textarea>
+    <button id="saveBtn">💾 Saqlash</button>
+  </div>
+
+  <div class="section">
+    <h4 id="books">Tavsiya etilgan kitoblar</h4>
+    <div id="recommendedBooks" class="recommended-books"></div>
+  </div>
+
+  <script src="lang.js"></script>
+  <script>
+    const menu = document.getElementById("menu");
+    function toggleMenu() {
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    // Mahalliy ma’lumotlar
+    const user = JSON.parse(localStorage.getItem("onkit_user")) || {};
+    document.getElementById("name").value = user.name || "";
+    document.getElementById("bio").value = user.bio || "";
+    document.getElementById("welcome").textContent += " " + (user.username || "");
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      user.name = document.getElementById("name").value;
+      user.bio = document.getElementById("bio").value;
+      localStorage.setItem("onkit_user", JSON.stringify(user));
+      alert("✅ Profil saqlandi!");
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("onkit_logged_in");
+      window.location.href = "login.html";
+    });
+
+    // Tavsiya kitoblar yuklash
+    fetch("books.json")
+      .then(res => res.json())
+      .then(books => {
+        const container = document.getElementById("recommendedBooks");
+        books.forEach(book => {
+          const card = document.createElement("div");
+          card.className = "book-card";
+          card.innerHTML = `
+            <img src="${book.cover}" alt="${book.title}">
+            <p>${book.title}</p>
+            <small>${book.author}</small>
+          `;
+          container.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>
